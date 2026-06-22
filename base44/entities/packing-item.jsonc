@@ -1,0 +1,34 @@
+{
+  "name": "PackingItem",
+  "type": "object",
+  "description": "A gear or packing item linked to an event.",
+  "properties": {
+    "family_id": {
+      "type": "string"
+    },
+    "approved_event_id": {
+      "type": "string",
+      "description": "Event this item belongs to"
+    },
+    "family_member_id": {
+      "type": "string"
+    },
+    "item_name": {
+      "type": "string",
+      "description": "e.g. Hockey stick, Shin guards, Water bottle, Jersey #14"
+    },
+    "category": {
+      "type": "string",
+      "enum": ["gear", "uniform", "documents", "food_drink", "other"],
+      "default": "gear"
+    },
+    "is_packed": {
+      "type": "boolean",
+      "default": false
+    },
+    "notes": {
+      "type": "string"
+    }
+  },
+  "required": ["family_id", "item_name"]
+}

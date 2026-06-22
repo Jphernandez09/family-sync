@@ -1,0 +1,34 @@
+{
+  "name": "Family",
+  "type": "object",
+  "description": "Top-level family unit. One per household.",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Family name (e.g. The Hernandez Family)"
+    },
+    "home_location": {
+      "type": "string",
+      "description": "Home base city/zip for drive-time estimates"
+    },
+    "timezone": {
+      "type": "string",
+      "description": "IANA timezone string e.g. America/Chicago"
+    },
+    "subscription_status": {
+      "type": "string",
+      "enum": ["free", "plus", "team"],
+      "default": "free",
+      "description": "Subscription tier"
+    },
+    "upload_count_this_month": {
+      "type": "integer",
+      "description": "Monthly upload counter for free plan limits"
+    },
+    "created_by": {
+      "type": "string",
+      "description": "User ID of the parent who created this family"
+    }
+  },
+  "required": ["name", "created_by"]
+}

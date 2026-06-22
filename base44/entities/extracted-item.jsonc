@@ -1,0 +1,148 @@
+{
+  "name": "ExtractedItem",
+  "type": "object",
+  "description": "A single structured item extracted by AI from an upload. Awaits parent review.",
+  "properties": {
+    "family_id": {
+      "type": "string"
+    },
+    "upload_id": {
+      "type": "string",
+      "description": "Reference to source Upload"
+    },
+    "item_type": {
+      "type": "string",
+      "enum": [
+        "calendar_event",
+        "task",
+        "payment",
+        "form_required",
+        "packing_item",
+        "travel_note",
+        "conflict_warning",
+        "general_note"
+      ],
+      "description": "Semantic category of this extracted item"
+    },
+    "review_status": {
+      "type": "string",
+      "enum": ["pending", "approved", "rejected", "edited_approved"],
+      "default": "pending"
+    },
+    "confidence_score": {
+      "type": "number",
+      "description": "AI confidence 0.0–1.0. Flag items below 0.7 for extra review."
+    },
+    "title": {
+      "type": "string",
+      "description": "Short human-readable title of this item"
+    },
+    "description": {
+      "type": "string",
+      "description": "Additional detail or context"
+    },
+    "sport_activity": {
+      "type": "string",
+      "description": "Sport or activity type (soccer, hockey, camp, etc.)"
+    },
+    "family_member_name": {
+      "type": "string",
+      "description": "Which child or family member this is for"
+    },
+    "family_member_id": {
+      "type": "string",
+      "description": "Linked FamilyMember ID if matched"
+    },
+    "event_date": {
+      "type": "string",
+      "format": "date",
+      "description": "ISO date for calendar events"
+    },
+    "start_time": {
+      "type": "string",
+      "description": "HH:MM 24hr format"
+    },
+    "end_time": {
+      "type": "string",
+      "description": "HH:MM 24hr format"
+    },
+    "arrival_time": {
+      "type": "string",
+      "description": "HH:MM — when they need to arrive (if different from start)"
+    },
+    "leave_by_time": {
+      "type": "string",
+      "description": "HH:MM — when the family needs to leave home"
+    },
+    "location_name": {
+      "type": "string",
+      "description": "Venue or location name"
+    },
+    "location_address": {
+      "type": "string",
+      "description": "Full address if available"
+    },
+    "deadline": {
+      "type": "string",
+      "format": "date",
+      "description": "Due date for tasks, forms, payments"
+    },
+    "amount": {
+      "type": "number",
+      "description": "Dollar amount for payment items"
+    },
+    "payable_to": {
+      "type": "string",
+      "description": "Who/where payment goes"
+    },
+    "payment_method": {
+      "type": "string",
+      "description": "Cash, check, online portal, etc."
+    },
+    "form_name": {
+      "type": "string",
+      "description": "Name of form/waiver/permission slip if form_required"
+    },
+    "form_url": {
+      "type": "string",
+      "description": "Link to online form if present"
+    },
+    "packing_items": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "List of gear/items to pack"
+    },
+    "uniform_notes": {
+      "type": "string",
+      "description": "Uniform color, number, requirements"
+    },
+    "contact_name": {
+      "type": "string",
+      "description": "Coach, organizer, or contact person"
+    },
+    "contact_phone": {
+      "type": "string"
+    },
+    "contact_email": {
+      "type": "string"
+    },
+    "source_text": {
+      "type": "string",
+      "description": "The exact text excerpt from the upload that produced this item"
+    },
+    "is_recurring": {
+      "type": "boolean",
+      "description": "True if this appears to be a recurring event"
+    },
+    "recurrence_pattern": {
+      "type": "string",
+      "description": "Human-readable recurrence (Every Tuesday, Weekly until Aug 15)"
+    },
+    "flags": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Warning flags: possible_conflict, needs_payment, needs_form, low_confidence"
+    }
+  },
+  "required": ["family_id", "upload_id", "item_type", "title"]
+}

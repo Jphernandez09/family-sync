@@ -1,0 +1,67 @@
+{
+  "name": "Upload",
+  "type": "object",
+  "description": "A raw input uploaded by the parent — screenshot, PDF, pasted text, or note.",
+  "properties": {
+    "family_id": {
+      "type": "string",
+      "description": "Reference to Family"
+    },
+    "uploaded_by": {
+      "type": "string",
+      "description": "User ID who uploaded this"
+    },
+    "source_type": {
+      "type": "string",
+      "enum": ["image", "pdf", "text", "note"],
+      "description": "How the content arrived"
+    },
+    "status": {
+      "type": "string",
+      "enum": ["pending_extraction", "extracting", "review_ready", "completed", "failed"],
+      "default": "pending_extraction",
+      "description": "Processing pipeline stage"
+    },
+    "title": {
+      "type": "string",
+      "description": "Auto-generated or user-provided title for this upload"
+    },
+    "raw_text": {
+      "type": "string",
+      "description": "Raw text content (pasted text, extracted from PDF/image OCR)"
+    },
+    "file_url": {
+      "type": "string",
+      "format": "uri",
+      "description": "URL to stored file if image or PDF"
+    },
+    "file_name": {
+      "type": "string",
+      "description": "Original filename"
+    },
+    "file_size_bytes": {
+      "type": "integer"
+    },
+    "extraction_result": {
+      "type": "object",
+      "description": "Raw JSON returned by the AI extraction function"
+    },
+    "extraction_error": {
+      "type": "string",
+      "description": "Error message if extraction failed"
+    },
+    "items_extracted": {
+      "type": "integer",
+      "description": "Count of extracted items from this upload"
+    },
+    "items_approved": {
+      "type": "integer",
+      "description": "Count of approved items from this upload"
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": ["family_id", "uploaded_by", "source_type"]
+}

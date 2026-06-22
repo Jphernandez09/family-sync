@@ -1,0 +1,47 @@
+{
+  "name": "FamilyMember",
+  "type": "object",
+  "description": "A parent, guardian, or child in the family.",
+  "properties": {
+    "family_id": {
+      "type": "string",
+      "description": "Reference to Family entity"
+    },
+    "name": {
+      "type": "string",
+      "description": "First name or nickname (e.g. Sofia, Dad)"
+    },
+    "role": {
+      "type": "string",
+      "enum": ["parent", "guardian", "child"],
+      "default": "child"
+    },
+    "birth_year": {
+      "type": "integer",
+      "description": "Used to calculate age-appropriate sport groupings"
+    },
+    "sports": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Sports and activities this member participates in"
+    },
+    "team_names": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Team names e.g. Storm U10, Lightning, Northside Rec"
+    },
+    "jersey_number": {
+      "type": "string",
+      "description": "Optional jersey or player number"
+    },
+    "coach_contact": {
+      "type": "string",
+      "description": "Coach name or contact info for this member"
+    },
+    "color": {
+      "type": "string",
+      "description": "UI color tag for calendar display (hex or Tailwind color name)"
+    }
+  },
+  "required": ["family_id", "name", "role"]
+}

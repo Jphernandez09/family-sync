@@ -1,0 +1,28 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+.vite/
+
+# Environment (contains secret app ID)
+.env
+.env.local
+.env.*.local
+
+# Base44 generated files
+base44/.app.jsonc
+
+# Editor / OS
+.DS_Store
+Thumbs.db
+*.swp
+.idea/
+.vscode/settings.json
+
+# PWA dev artifacts
+dev-dist/
+
+# Logs
+*.log
+npm-debug.log*

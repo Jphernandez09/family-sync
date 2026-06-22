@@ -1,0 +1,73 @@
+{
+  "name": "ApprovedEvent",
+  "type": "object",
+  "description": "A parent-approved calendar event ready for the Weekly GamePlan and export.",
+  "properties": {
+    "family_id": {
+      "type": "string"
+    },
+    "extracted_item_id": {
+      "type": "string",
+      "description": "Source ExtractedItem if created via review workflow"
+    },
+    "upload_id": {
+      "type": "string"
+    },
+    "title": {
+      "type": "string"
+    },
+    "event_type": {
+      "type": "string",
+      "enum": ["game", "practice", "tournament", "camp", "school", "appointment", "other"],
+      "default": "other"
+    },
+    "sport_activity": {
+      "type": "string"
+    },
+    "family_member_ids": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "FamilyMember IDs attending this event"
+    },
+    "event_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "start_time": {
+      "type": "string"
+    },
+    "end_time": {
+      "type": "string"
+    },
+    "arrival_time": {
+      "type": "string"
+    },
+    "leave_by_time": {
+      "type": "string"
+    },
+    "location_name": {
+      "type": "string"
+    },
+    "location_address": {
+      "type": "string"
+    },
+    "notes": {
+      "type": "string"
+    },
+    "is_recurring": {
+      "type": "boolean"
+    },
+    "recurrence_pattern": {
+      "type": "string"
+    },
+    "ics_uid": {
+      "type": "string",
+      "description": "Stable UID for .ics export — generated once and preserved"
+    },
+    "exported_to_calendar": {
+      "type": "boolean",
+      "default": false
+    }
+  },
+  "required": ["family_id", "title", "event_date"]
+}

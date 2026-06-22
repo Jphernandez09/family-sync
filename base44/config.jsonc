@@ -1,0 +1,12 @@
+{
+  "name": "FamilySync",
+  "description": "AI-powered family sports organizer — upload chaos, get one clean plan",
+  "entitiesDir": "./entities",
+  "functionsDir": "./functions",
+  "site": {
+    "installCommand": "npm install",
+    "buildCommand": "npm run build",
+    "serveCommand": "npm run dev",
+    "outputDirectory": "./dist"
+  }
+}

@@ -1,0 +1,57 @@
+{
+  "name": "TaskItem",
+  "type": "object",
+  "description": "An action item, form, payment, or to-do extracted and approved for the family.",
+  "properties": {
+    "family_id": {
+      "type": "string"
+    },
+    "extracted_item_id": {
+      "type": "string"
+    },
+    "upload_id": {
+      "type": "string"
+    },
+    "task_type": {
+      "type": "string",
+      "enum": ["payment", "form_required", "general_task", "reminder"],
+      "default": "general_task"
+    },
+    "title": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string"
+    },
+    "family_member_ids": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "deadline": {
+      "type": "string",
+      "format": "date"
+    },
+    "amount": {
+      "type": "number"
+    },
+    "payable_to": {
+      "type": "string"
+    },
+    "form_name": {
+      "type": "string"
+    },
+    "form_url": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": ["pending", "in_progress", "done"],
+      "default": "pending"
+    },
+    "is_urgent": {
+      "type": "boolean",
+      "default": false
+    }
+  },
+  "required": ["family_id", "title", "task_type"]
+}
