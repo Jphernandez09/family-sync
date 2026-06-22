@@ -41,3 +41,11 @@ export async function logout() {
   if (DEMO_MODE) return;
   return auth.logout?.();
 }
+
+export async function verifyOtp(email, otpCode) {
+  return auth.verifyOtp({ email, otpCode });
+}
+
+export async function resendOtp(email) {
+  return auth.resendOtp(email);
+}

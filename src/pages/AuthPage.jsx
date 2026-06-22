@@ -1,16 +1,18 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { loginWithEmail, loginWithGoogle, register } from "../services/auth.service.js";
+import { loginWithEmail, loginWithGoogle, register, verifyOtp, resendOtp } from "../services/auth.service.js";
 import Button from "../components/ui/Button.jsx";
 import Input from "../components/ui/Input.jsx";
 
 export default function AuthPage() {
-  const [mode, setMode] = useState("login"); // "login" | "signup"
+  const [mode, setMode] = useState("login"); // "login" | "signup" | "verify"
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [fullName, setFullName] = useState("");
+  const [otpCode, setOtpCode] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [resendCooldown, setResendCooldown] = useState(false);
   const navigate = useNavigate();
 
   async function handleSubmit(e) {
@@ -20,15 +22,49 @@ export default function AuthPage() {
     try {
       if (mode === "login") {
         await loginWithEmail(email, password);
-      } else {
+        navigate("/");
+      } else if (mode === "signup") {
         await register({ email, password, fullName });
+        setMode("verify");
       }
-      navigate("/");
     } catch (err) {
-      setError(err?.message || "Something went wrong. Please try again.");
+      const msg = err?.message || "";
+      // If login fails due to unverified email, nudge to verify
+      if (msg.toLowerCase().includes("verify")) {
+        setMode("verify");
+      } else {
+        setError(msg || "Something went wrong. Please try again.");
+      }
     } finally {
       setLoading(false);
     }
+  }
+
+  async function handleVerify(e) {
+    e.preventDefault();
+    setError("");
+    setLoading(true);
+    try {
+      await verifyOtp(email, otpCode.trim());
+      // Auto-login after verification
+      await loginWithEmail(email, password);
+      navigate("/");
+    } catch (err) {
+      setError(err?.message || "Invalid code. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function handleResend() {
+    setError("");
+    setResendCooldown(true);
+    try {
+      await resendOtp(email);
+    } catch (err) {
+      setError(err?.message || "Couldn't resend code. Try again shortly.");
+    }
+    setTimeout(() => setResendCooldown(false), 30000);
   }
 
   async function handleGoogle() {
@@ -38,11 +74,72 @@ export default function AuthPage() {
       navigate("/");
     } catch (err) {
       setError(err?.message || "Google sign-in failed.");
-    } finally {
       setLoading(false);
     }
   }
 
+  // ── Verify OTP screen ──────────────────────────────────────────────────────
+  if (mode === "verify") {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-brand-50 to-white flex flex-col items-center justify-center px-5 py-12">
+        <div className="text-center mb-8">
+          <div className="w-16 h-16 rounded-3xl bg-brand-500 flex items-center justify-center text-3xl mx-auto mb-4 shadow-float">
+            📬
+          </div>
+          <h1 className="text-2xl font-bold text-slate-800">Check your email</h1>
+          <p className="text-slate-500 mt-2 text-sm">
+            We sent a verification code to<br />
+            <span className="font-medium text-slate-700">{email}</span>
+          </p>
+        </div>
+
+        <div className="w-full max-w-sm bg-white rounded-3xl shadow-float p-6">
+          <form onSubmit={handleVerify} className="space-y-4">
+            <Input
+              label="Verification code"
+              value={otpCode}
+              onChange={(e) => setOtpCode(e.target.value)}
+              placeholder="Enter the 6-digit code"
+              autoComplete="one-time-code"
+              inputMode="numeric"
+              required
+            />
+
+            {error && (
+              <div className="bg-red-50 text-red-600 text-sm rounded-xl px-3 py-2">
+                {error}
+              </div>
+            )}
+
+            <Button type="submit" fullWidth loading={loading}>
+              Verify & Sign In
+            </Button>
+          </form>
+
+          <div className="mt-4 text-center">
+            <button
+              onClick={handleResend}
+              disabled={resendCooldown}
+              className="text-sm text-brand-500 font-medium disabled:text-slate-400 disabled:cursor-not-allowed"
+            >
+              {resendCooldown ? "Code sent — check your inbox" : "Resend code"}
+            </button>
+          </div>
+
+          <div className="mt-3 text-center">
+            <button
+              onClick={() => { setMode("signup"); setOtpCode(""); setError(""); }}
+              className="text-xs text-slate-400 underline"
+            >
+              Back
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // ── Login / Signup screen ──────────────────────────────────────────────────
   return (
     <div className="min-h-screen bg-gradient-to-b from-brand-50 to-white flex flex-col items-center justify-center px-5 py-12">
       {/* Logo / Hero */}
@@ -59,7 +156,7 @@ export default function AuthPage() {
         {/* Tab switcher */}
         <div className="flex bg-slate-100 rounded-2xl p-1 mb-6">
           <button
-            onClick={() => setMode("login")}
+            onClick={() => { setMode("login"); setError(""); }}
             className={`flex-1 py-2 text-sm font-semibold rounded-xl transition-colors ${
               mode === "login"
                 ? "bg-white text-slate-800 shadow-sm"
@@ -69,7 +166,7 @@ export default function AuthPage() {
             Sign In
           </button>
           <button
-            onClick={() => setMode("signup")}
+            onClick={() => { setMode("signup"); setError(""); }}
             className={`flex-1 py-2 text-sm font-semibold rounded-xl transition-colors ${
               mode === "signup"
                 ? "bg-white text-slate-800 shadow-sm"
@@ -128,7 +225,7 @@ export default function AuthPage() {
         </div>
 
         {/* Google */}
-        <Button variant="secondary" fullWidth onClick={handleGoogle} loading={loading}>
+        <Button variant="secondary" fullWidth onClick={handleGoogle} disabled={loading}>
           <svg className="w-4 h-4" viewBox="0 0 24 24">
             <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
             <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
@@ -141,7 +238,7 @@ export default function AuthPage() {
         {mode === "login" && (
           <p className="text-center text-xs text-slate-400 mt-4">
             Don't have an account?{" "}
-            <button onClick={() => setMode("signup")} className="text-brand-500 font-medium">
+            <button onClick={() => { setMode("signup"); setError(""); }} className="text-brand-500 font-medium">
               Sign up free
             </button>
           </p>
