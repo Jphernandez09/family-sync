@@ -4,7 +4,7 @@ import { loginWithEmail, loginWithGoogle, register, verifyOtp, resendOtp } from 
 import Button from "../components/ui/Button.jsx";
 import Input from "../components/ui/Input.jsx";
 
-export default function AuthPage() {
+export default function AuthPage({ onAuth }) {
   const [mode, setMode] = useState("login"); // "login" | "signup" | "verify"
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -22,6 +22,7 @@ export default function AuthPage() {
     try {
       if (mode === "login") {
         await loginWithEmail(email, password);
+        onAuth?.();
         navigate("/");
       } else if (mode === "signup") {
         await register({ email, password, fullName });
@@ -48,6 +49,7 @@ export default function AuthPage() {
       await verifyOtp(email, otpCode.trim());
       // Auto-login after verification
       await loginWithEmail(email, password);
+      onAuth?.();
       navigate("/");
     } catch (err) {
       setError(err?.message || "Invalid code. Please try again.");
@@ -71,6 +73,7 @@ export default function AuthPage() {
     setLoading(true);
     try {
       await loginWithGoogle();
+      onAuth?.();
       navigate("/");
     } catch (err) {
       setError(err?.message || "Google sign-in failed.");
