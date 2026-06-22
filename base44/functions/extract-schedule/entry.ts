@@ -7,74 +7,19 @@
  * Invoked via: base44.functions.invoke("extract-schedule", { rawText, familyContext })
  */
 
-import { base44 } from "@base44/sdk/functions";
+import { createClientFromRequest } from "npm:@base44/sdk";
 
-interface FamilyContext {
-  memberNames: string[];   // e.g. ["Sofia", "Marco", "Dad", "Mom"]
-  sports: string[];        // e.g. ["soccer", "hockey", "swimming"]
-  teamNames: string[];     // e.g. ["Storm U10", "Lightning"]
-  homeLocation?: string;   // e.g. "Chicago, IL"
-}
-
-interface ExtractedItem {
-  item_type:
-    | "calendar_event"
-    | "task"
-    | "payment"
-    | "form_required"
-    | "packing_item"
-    | "travel_note"
-    | "conflict_warning"
-    | "general_note";
-  confidence_score: number;
-  title: string;
-  description?: string;
-  sport_activity?: string;
-  family_member_name?: string;
-  event_date?: string;         // ISO date YYYY-MM-DD
-  start_time?: string;         // HH:MM 24hr
-  end_time?: string;
-  arrival_time?: string;
-  leave_by_time?: string;
-  location_name?: string;
-  location_address?: string;
-  deadline?: string;           // ISO date for tasks/forms/payments
-  amount?: number;
-  payable_to?: string;
-  payment_method?: string;
-  form_name?: string;
-  form_url?: string;
-  packing_items?: string[];
-  uniform_notes?: string;
-  contact_name?: string;
-  contact_phone?: string;
-  contact_email?: string;
-  source_text?: string;
-  is_recurring?: boolean;
-  recurrence_pattern?: string;
-  flags?: string[];
-}
-
-interface ExtractionResult {
-  items: ExtractedItem[];
-  summary: string;
-  extraction_confidence: number;
-  raw_prompt_used?: string;
-}
-
-export default async function handler(input: {
-  rawText: string;
-  familyContext?: FamilyContext;
-  uploadId?: string;
-}) {
+Deno.serve(async (req: Request) => {
+  const base44 = createClientFromRequest(req);
+  const input = await req.json();
   const { rawText, familyContext } = input;
 
   if (!rawText || rawText.trim().length < 10) {
-    return {
+    return Response.json({
       items: [],
       summary: "No meaningful content to extract.",
       extraction_confidence: 0,
-    } as ExtractionResult;
+    });
   }
 
   const memberContext = familyContext?.memberNames?.length
@@ -183,12 +128,10 @@ Return a JSON object with this exact shape:
       },
     });
 
-    // Normalize and sanitize the response
-    const result = response as ExtractionResult;
-
-    result.items = result.items.map((item) => ({
+    // Normalize confidence flags
+    const result = response as any;
+    result.items = (result.items || []).map((item: any) => ({
       ...item,
-      // Ensure confidence flags
       flags: [
         ...(item.flags || []),
         ...(item.confidence_score < 0.7 && !item.flags?.includes("low_confidence")
@@ -197,14 +140,14 @@ Return a JSON object with this exact shape:
       ],
     }));
 
-    return result;
+    return Response.json(result);
   } catch (error) {
     console.error("Extraction failed:", error);
-    return {
+    return Response.json({
       items: [],
       summary: "Extraction failed. Please try again or enter items manually.",
       extraction_confidence: 0,
       error: String(error),
-    };
+    });
   }
-}
+});
